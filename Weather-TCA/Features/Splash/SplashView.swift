@@ -21,6 +21,9 @@ struct SplashView: View {
                 .scaledToFit()
                 .frame(width: 150, height: 150)
         }
+        .onAppear() {
+            store.send(.fetchCurrentWeather)
+        }
     }
 }
 

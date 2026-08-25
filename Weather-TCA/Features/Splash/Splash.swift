@@ -12,7 +12,7 @@ struct Splash {
     @Dependency(\.weatherAdapter) var adapter
     @ObservableState
     struct State {
-        var weather: Weather?
+        
     }
     
     enum Action {
@@ -26,7 +26,9 @@ struct Splash {
             case .fetchCurrentWeather:
                 return .run { send in
                     let weather = try await adapter.fetchCurrentWeather("Seoul")
-                    await send(.responseCurrentWeather(weather))
+                    await send(
+                        .responseCurrentWeather(weather)
+                    )
                 }
             default:
                 return .none
