@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3905E6A330370B12005CEFCB /* Moya in Frameworks */ = {isa = PBXBuildFile; productRef = 3905E6A230370B12005CEFCB /* Moya */; };
 		3917BA91303418100014022F /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = 3917BA90303418100014022F /* ComposableArchitecture */; };
 /* End PBXBuildFile section */
 
@@ -27,6 +28,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3905E6A330370B12005CEFCB /* Moya in Frameworks */,
 				3917BA91303418100014022F /* ComposableArchitecture in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -34,10 +36,18 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		3905E6A130370B12005CEFCB /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		397517C1303414C900E3FB85 = {
 			isa = PBXGroup;
 			children = (
 				397517CC303414C900E3FB85 /* Weather-TCA */,
+				3905E6A130370B12005CEFCB /* Frameworks */,
 				397517CB303414C900E3FB85 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -71,6 +81,7 @@
 			name = "Weather-TCA";
 			packageProductDependencies = (
 				3917BA90303418100014022F /* ComposableArchitecture */,
+				3905E6A230370B12005CEFCB /* Moya */,
 			);
 			productName = "Weather-TCA";
 			productReference = 397517CA303414C900E3FB85 /* Weather-TCA.app */;
@@ -355,6 +366,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		3905E6A230370B12005CEFCB /* Moya */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3917BAAD3036C2950014022F /* XCRemoteSwiftPackageReference "Moya" */;
+			productName = Moya;
+		};
 		3917BA90303418100014022F /* ComposableArchitecture */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 3917BA8F303418100014022F /* XCRemoteSwiftPackageReference "swift-composable-architecture" */;

@@ -61,6 +61,7 @@ enum JSONSerializer {
 
 
 final class NetworkClient {
+    static let shared: NetworkClient = .init()
     typealias MoyaResult = Result<Moya.Response, MoyaError>
     
     func codable<T: Decodable, E: TargetType>(_ target: E) async throws -> T {
