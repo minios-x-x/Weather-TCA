@@ -26,6 +26,8 @@ struct Splash {
             case .fetchCurrentWeather:
                 return .run { send in
                     let weather = try await adapter.fetchCurrentWeather("Seoul")
+                    
+                    dump(weather)
                     await send(
                         .responseCurrentWeather(weather)
                     )

@@ -44,6 +44,12 @@ struct Weather: Decodable {
     struct Wind: Decodable {
         let speed: Double
         let deg: Int
+        
+        var direction: String {
+            let directions = ["북", "북동", "동", "남동", "남", "남서", "서", "북서"]
+            let index = Int((Double(deg) / 45).rounded()) % 8
+            return directions[index]
+        }
     }
 
     struct Clouds: Decodable {
@@ -95,4 +101,39 @@ struct Weather: Decodable {
     var observedAt: Date {
         Date(timeIntervalSince1970: TimeInterval(dtTimestamp))
     }
+    
+    static let mock: Weather = .init(
+        coordinate: .init(
+            lng: 126.9778,
+            lat: 37.5683
+        ),
+        condition: [
+            .init(
+                id: 802,
+                main: "Clouds",
+                description: "구름조금",
+                icon: "09d"
+            )
+        ],
+        info: .init(
+            temp: 32.76,
+            pressure: 1010,
+            humidity: 62,
+            tempMin: 32.76,
+            tempMax: 32.78
+        ),
+        visibility: 10000,
+        wind: .init(speed: 3.09, deg: 290),
+        clouds: .init(all: 48),
+        dtTimestamp: 1_700_000_000,
+        system: .init(
+            country: "KR",
+            sunriseTimestamp: 1_699_970_000,
+            sunsetTimestamp: 1_700_010_000
+        ),
+        id: 1835848,
+        name: "Seoul",
+        cod: 200
+    )
 }
+

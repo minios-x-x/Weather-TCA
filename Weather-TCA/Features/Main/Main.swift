@@ -11,7 +11,7 @@ import ComposableArchitecture
 struct Main {
     @ObservableState
     struct State {
-        var weather: Weather?
+        var weather: Weather
     }
     
     enum Action {
