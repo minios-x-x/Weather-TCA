@@ -10,14 +10,17 @@ import ComposableArchitecture
 @Reducer
 struct Splash {
     @Dependency(\.weatherAdapter) var adapter
+    
     @ObservableState
-    struct State {
-        
+    struct State: Equatable {
+        var isSplashCompleted: Bool = false
+        var isSplashErrored: Bool = false
     }
     
     enum Action {
         case fetchCurrentWeather
         case responseCurrentWeather(Weather)
+        case responseFetchError(Error)
     }
     
     var body: some ReducerOf<Self> {
@@ -28,10 +31,22 @@ struct Splash {
                     let weather = try await adapter.fetchCurrentWeather("Seoul")
                     
                     dump(weather)
+                    
                     await send(
                         .responseCurrentWeather(weather)
                     )
+                } catch: { error, send in
+                    print("FETCH ERROR: \(error.localizedDescription)")
+                    await send(
+                        .responseFetchError(error)
+                    )
                 }
+            case .responseCurrentWeather(_):
+                state.isSplashCompleted = true
+                return .none
+            case .responseFetchError(let error):
+                state.isSplashErrored = true
+                return .none
             default:
                 return .none
             }

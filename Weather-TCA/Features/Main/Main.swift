@@ -10,7 +10,7 @@ import ComposableArchitecture
 @Reducer
 struct Main {
     @ObservableState
-    struct State {
+    struct State: Equatable {
         var weather: Weather
     }
     

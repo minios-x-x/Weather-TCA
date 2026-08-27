@@ -10,8 +10,8 @@ import ComposableArchitecture
 @Reducer
 struct Root {
     @ObservableState
-    struct State {
-        private(set) var isSplashActive: Bool = true
+    struct State: Equatable {
+        var isSplashActive: Bool = true
         var main: Main.State?
         var splash: Splash.State = .init()
         

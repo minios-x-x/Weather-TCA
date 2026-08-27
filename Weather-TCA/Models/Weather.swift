@@ -9,8 +9,8 @@ import Foundation
 
 /// OpenWeatherMap "Current Weather Data" API 응답 모델
 /// https://openweathermap.org/current
-struct Weather: Decodable {
-    struct Coordinate: Decodable {
+struct Weather: Decodable, Equatable {
+    struct Coordinate: Decodable, Equatable {
         let lng: Double
         let lat: Double
         
@@ -20,14 +20,14 @@ struct Weather: Decodable {
         }
     }
 
-    struct Condition: Decodable {
+    struct Condition: Decodable, Equatable {
         let id: Int
         let main: String
         let description: String
         let icon: String
     }
 
-    struct Info: Decodable {
+    struct Info: Decodable, Equatable {
         let temp: Double
         let pressure: Int
         let humidity: Int
@@ -41,7 +41,7 @@ struct Weather: Decodable {
         }
     }
 
-    struct Wind: Decodable {
+    struct Wind: Decodable, Equatable {
         let speed: Double
         let deg: Int
         
@@ -52,11 +52,11 @@ struct Weather: Decodable {
         }
     }
 
-    struct Clouds: Decodable {
+    struct Clouds: Decodable, Equatable {
         let all: Int
     }
 
-    struct System: Decodable {
+    struct System: Decodable, Equatable {
         let country: String?
         let sunriseTimestamp: Int
         let sunsetTimestamp: Int
