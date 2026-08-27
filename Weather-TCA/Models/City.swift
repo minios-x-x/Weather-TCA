@@ -1,0 +1,44 @@
+//
+//  City.swift
+//  Weather-TCA
+//
+//  Created by 민경준 on 8/27/26.
+//
+
+import Foundation
+
+struct Locality: Codable, Equatable {
+    struct Coordinate: Codable, Equatable {
+        let lat: Double
+        let lng: Double
+    }
+    
+    let id: Int
+    let country: String
+    let province: String
+    let city: String
+    let coord: Coordinate
+}
+
+extension Locality {
+    static let seoul: Locality = .init(
+        id: 1,
+        country: "대한민국",
+        province: "서울특별시",
+        city: "서울특별시",
+        coord: .init(
+            lat: 37.5665,
+            lng: 126.9780
+        )
+    )
+    static let suwon: Locality = .init(
+        id: 9,
+        country: "대한민국",
+        province: "경기도",
+        city: "수원시",
+        coord: .init(
+            lat: 37.2636,
+            lng: 127.0286
+        )
+    )
+}
