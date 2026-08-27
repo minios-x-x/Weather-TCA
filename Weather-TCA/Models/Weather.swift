@@ -98,7 +98,7 @@ struct Weather: Decodable, Equatable, Identifiable {
     }
 
     /// 관측 시각 (dt를 Date로 변환)
-    var observedAt: Date {
+    var date: Date {
         Date(timeIntervalSince1970: TimeInterval(dtTimestamp))
     }
     

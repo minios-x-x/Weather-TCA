@@ -1,5 +1,5 @@
 //
-//  City.swift
+//  Locality.swift
 //  Weather-TCA
 //
 //  Created by 민경준 on 8/27/26.

@@ -22,6 +22,8 @@ struct Main {
         var cityList: [Target]
         var selectedCity: Target?
         var hasPresented: Bool = false
+        var searchQuery: String = ""
+        var isOnSearching: Bool = false
         
         init(initialValue target: Target) {
             cityList = [target]
@@ -31,6 +33,8 @@ struct Main {
     
     enum Action {
         case selectCity(Target?)
+        case queryChanged(String)
+        case focusChanged(Bool)
     }
     
     var body: some ReducerOf<Self> {
@@ -39,6 +43,8 @@ struct Main {
             case .selectCity(let weather):
                 state.hasPresented = true
                 state.selectedCity = weather
+                return .none
+            default:
                 return .none
             }
         }
