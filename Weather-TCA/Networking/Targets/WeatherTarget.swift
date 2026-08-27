@@ -8,7 +8,7 @@
 import Moya
 
 enum WeatherTarget {
-    case current(city: String)
+    case current(coord: Locality.Coordinate)
 }
 
 extension WeatherTarget: MoyaTarget {
@@ -28,9 +28,10 @@ extension WeatherTarget: MoyaTarget {
     
     var task: Moya.Task {
         switch self {
-        case .current(let city):
+        case .current(let target):
             let parameters: [String: Any] = [
-                "q": city,
+                "lat": target.lat,
+                "lon": target.lng,
                 "units": "metric",
                 "lang": "kr",
                 "appid": "825364e6c96d79c5c7f65e4bb2130762"

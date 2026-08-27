@@ -22,7 +22,7 @@ struct SplashView: View {
                 .frame(width: 150, height: 150)
         }
         .onAppear() {
-            store.send(.fetchCurrentWeather)
+            store.send(.onAppear)
         }
     }
 }
