@@ -15,8 +15,8 @@ struct Root {
         var main: Main.State?
         var splash: Splash.State = .init()
         
-        mutating func finishSplash(initialValue weather: Weather) {
-            self.main = .init(weather: weather)
+        mutating func finishSplash(initialValue target: Main.Target) {
+            self.main = .init(initialValue: target)
             self.isSplashActive = false
         }
     }
@@ -32,8 +32,14 @@ struct Root {
         
         Reduce { state, action in
             switch action {
-            case .splash(.responseCurrentWeather(let weather)):
-                state.finishSplash(initialValue: weather)
+            case .splash(.finishSplash):
+                state.finishSplash(
+                    initialValue: .init(
+                        locality: state.splash.locality!,
+                        weather: state.splash.weather,
+                        forecast: state.splash.forecast
+                    )
+                )
                 return .none
             default:
                 return .none

@@ -9,7 +9,7 @@ import Foundation
 
 /// OpenWeatherMap "Current Weather Data" API 응답 모델
 /// https://openweathermap.org/current
-struct Weather: Decodable, Equatable {
+struct Weather: Decodable, Equatable, Identifiable {
     struct Coordinate: Decodable, Equatable {
         let lng: Double
         let lat: Double

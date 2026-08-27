@@ -9,16 +9,38 @@ import ComposableArchitecture
 
 @Reducer
 struct Main {
+    struct Target: Equatable, Identifiable {
+        var id: Int { locality.id }
+        let locality: Locality
+        var weather: Weather?
+        var forecast: Forecast?
+    }
+    
     @ObservableState
     struct State: Equatable {
-        var weather: Weather
+        @SharedReader(.localities) var localities
+        var cityList: [Target]
+        var selectedCity: Target?
+        var hasPresented: Bool = false
+        
+        init(initialValue target: Target) {
+            cityList = [target]
+            selectedCity = target
+        }
     }
     
     enum Action {
-        
+        case selectCity(Target?)
     }
     
     var body: some ReducerOf<Self> {
-        
+        Reduce { state, action in
+            switch action {
+            case .selectCity(let weather):
+                state.hasPresented = true
+                state.selectedCity = weather
+                return .none
+            }
+        }
     }
 }

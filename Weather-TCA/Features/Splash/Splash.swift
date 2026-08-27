@@ -16,14 +16,27 @@ struct Splash {
     struct State: Equatable {
         // 값을 채우는 쪽이니 읽기/쓰기가 모두 가능한 @Shared를 쓴다.
         @Shared(.localities) var localities
+        
+        var locality: Locality?
+        var weather: Weather?
+        var forecast: Forecast?
+        
+        var isFinish: Bool {
+            weather != nil && forecast != nil && locality != nil
+        }
     }
     
     enum Action {
         case onAppear
         case fetchLocalities
         case responseLocalities([Locality])
-        case fetchCurrentWeather
+        
+        case fetchCurrentWeather(Locality.Coordinate)
         case responseCurrentWeather(Weather)
+        case fetchCurrentForecast(Locality.Coordinate)
+        case responseCurrentForecast(Forecast)
+        
+        case finishSplash
         case responseFetchError(Error)
     }
     
@@ -43,10 +56,10 @@ struct Splash {
                     )
                 }
             case .responseLocalities(let localities):
-                // @Shared 값은 = 대신 withLock으로 바꾼다.
+                // @Shared 값은 `=` 대신 withLock으로 바꾼다.
                 state.$localities.withLock { $0 = localities }
-                return .send(.fetchCurrentWeather)
-            case .fetchCurrentWeather:
+                state.locality = localities.first
+                
                 // localities.first를 "기본 도시(서울)"로 취급한다.
                 // 나중에 "사용자가 마지막으로 본 도시"를 쓰게 되면 이 부분만 바뀌면 된다.
                 guard let target = state.localities.first else {
@@ -56,28 +69,48 @@ struct Splash {
                         )
                     )
                 }
-              
-                // .run 클로저 안에서는 state에 직접 접근할 수 없다.
-                // 그래서 필요한 값(target)을 캡처 리스트 [target]으로 미리 복사해서 넘긴다.
-                return .run { [target] send in
-                    let weather = try await weatherAdapter.fetchCurrentWeather(target.coord)
-                    
-                    dump(weather)
+                
+                return .merge(
+                    .send(.fetchCurrentWeather(target.coord)),
+                    .send(.fetchCurrentForecast(target.coord))
+                )
+            case .fetchCurrentWeather(let coord):
+                return .run { send in
+                    let weather = try await weatherAdapter.fetchCurrentWeather(coord)
                     await send(
                         .responseCurrentWeather(weather)
                     )
                 } catch: { error, send in
-                    print("FETCH ERROR: \(error.localizedDescription)")
+                    print("FETCH WEATHER ERROR: \(error.localizedDescription)")
                     await send(
                         .responseFetchError(error)
                     )
                 }
-            case .responseFetchError(let error):
-                print(error.localizedDescription)
-                return .none
+            case .responseCurrentWeather(let weather):
+                state.weather = weather
+                return finishIfReady(state)
+            case .fetchCurrentForecast(let coord):
+                return .run { send in
+                    let forecast = try await weatherAdapter.fetchCurrentForecast(coord)
+                    await send(
+                        .responseCurrentForecast(forecast)
+                    )
+                } catch: { error, send in
+                    print("FETCH FORECAST ERROR: \(error.localizedDescription)")
+                    await send(
+                        .responseFetchError(error)
+                    )
+                }
+            case .responseCurrentForecast(let forecast):
+                state.forecast = forecast
+                return finishIfReady(state)
             default:
                 return .none
             }
         }
+    }
+    
+    private func finishIfReady(_ state: State) -> Effect<Action> {
+        state.isFinish ? .send(.finishSplash) : .none
     }
 }

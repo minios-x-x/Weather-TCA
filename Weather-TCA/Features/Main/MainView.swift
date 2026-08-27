@@ -9,43 +9,50 @@ import ComposableArchitecture
 import SwiftUI
 
 struct MainView: View {
-    let store: StoreOf<Main>
+    @Namespace private var namespace
+    var store: StoreOf<Main>
     
     var body: some View {
-        VStack {
-            if let weather = store.state.weather.condition.first {
-                AsyncImage(
-                    url: URL(string: "https://openweathermap.org/img/wn/\(weather.icon)@2x.png"),
-                    content: { image in
-                        image
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 200, height: 200)
+        NavigationStack {
+            List(store.state.cityList) { city in
+                ZStack {
+                    Rectangle()
+                        .fill(Color.blue)
+                    Text(city.locality.city)
+                }
+                .matchedTransitionSource(
+                    id: city.id,
+                    in: namespace
+                )
+                .onTapGesture {
+                    store.send(
+                        .selectCity(city)
+                    )
+                }
+            }
+            .fullScreenCover(
+                item: Binding(
+                    get: {
+                        store.selectedCity
                     },
-                    placeholder: {
-                        ProgressView()
+                    set: { newValue in
+                        store.send(
+                            .selectCity(newValue)
+                        )
                     }
                 )
-                Text(weather.description)
-                
-                Text("온도: \(store.state.weather.info.temp)")
-                Text("최저온도: \(store.state.weather.info.tempMin)")
-                Text("최고온도: \(store.state.weather.info.tempMax)")
-                
-                Text("풍향: \(store.state.weather.wind.direction)풍")
-                Text("풍속: \(store.state.weather.wind.speed)")
+            ) { locality in
+                ForecastView()
+                    .navigationTransition(
+                        .zoom(sourceID: locality.id, in: namespace)
+                    )
+            }
+            .transaction { transaction in
+                if store.hasPresented == false {
+                    transaction.disablesAnimations = true
+                }
             }
         }
     }
 }
 
-#Preview {
-    MainView(
-        store: .init(
-            initialState: Main.State(weather: .mock),
-            reducer: {
-                Main()
-            }
-        )
-    )
-}

@@ -106,3 +106,114 @@ struct Forecast: Decodable, Equatable {
     // (Weather 모델의 cod는 Int였던 것과 다르다.)
     let cod: String
 }
+
+
+extension Forecast {
+    static let mock: Forecast = {
+        let json = """
+        {
+            "cod": "200",
+            "message": 0,
+            "cnt": 2,
+            "list": [
+                {
+                    "dt": 1787821200,
+                    "main": {
+                        "temp": 32.76,
+                        "feels_like": 39.62,
+                        "temp_min": 28.64,
+                        "temp_max": 32.76,
+                        "pressure": 1006,
+                        "sea_level": 1006,
+                        "grnd_level": 997,
+                        "humidity": 62,
+                        "temp_kf": 4.12,
+                        "dew_point": 24.52
+                    },
+                    "weather": [
+                        {
+                            "id": 500,
+                            "main": "Rain",
+                            "description": "실 비",
+                            "icon": "10d"
+                        }
+                    ],
+                    "clouds": {
+                        "all": 100
+                    },
+                    "wind": {
+                        "speed": 2.19,
+                        "deg": 264,
+                        "gust": 2.62
+                    },
+                    "visibility": 10000,
+                    "pop": 0.31,
+                    "rain": {
+                        "3h": 0.19
+                    },
+                    "sys": {
+                        "pod": "d"
+                    },
+                    "dt_txt": "2026-08-27 09:00:00"
+                },
+                {
+                    "dt": 1787832000,
+                    "main": {
+                        "temp": 30.92,
+                        "feels_like": 36.52,
+                        "temp_min": 27.24,
+                        "temp_max": 30.92,
+                        "pressure": 1007,
+                        "sea_level": 1007,
+                        "grnd_level": 998,
+                        "humidity": 67,
+                        "temp_kf": 3.68,
+                        "dew_point": 24.07
+                    },
+                    "weather": [
+                        {
+                            "id": 500,
+                            "main": "Rain",
+                            "description": "실 비",
+                            "icon": "10n"
+                        }
+                    ],
+                    "clouds": {
+                        "all": 100
+                    },
+                    "wind": {
+                        "speed": 0.76,
+                        "deg": 265,
+                        "gust": 0.94
+                    },
+                    "visibility": 10000,
+                    "pop": 0.74,
+                    "rain": {
+                        "3h": 0.93
+                    },
+                    "sys": {
+                        "pod": "n"
+                    },
+                    "dt_txt": "2026-08-27 12:00:00"
+                }
+            ],
+            "city": {
+                "id": 1835848,
+                "name": "Seoul",
+                "coord": {
+                    "lat": 37.5683,
+                    "lon": 126.9778
+                },
+                "country": "KR",
+                "population": 10349312,
+                "timezone": 32400,
+                "sunrise": 1787777869,
+                "sunset": 1787825410
+            }
+        }
+        """
+ 
+        let data = Data(json.utf8)
+        return try! JSONDecoder().decode(Forecast.self, from: data)
+    }()
+}

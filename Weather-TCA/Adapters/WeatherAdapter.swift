@@ -9,6 +9,7 @@ import ComposableArchitecture
 
 struct WeatherAdapter {
     var fetchCurrentWeather: (Locality.Coordinate) async throws -> Weather
+    var fetchCurrentForecast: (Locality.Coordinate) async throws -> Forecast
 }
 
 extension WeatherAdapter: DependencyKey {
@@ -18,6 +19,11 @@ extension WeatherAdapter: DependencyKey {
                 try await NetworkClient.shared.codable(
                     WeatherTarget.current(coord: coord)
                 )
+            },
+            fetchCurrentForecast: { coord in
+                try await NetworkClient.shared.codable(
+                    WeatherTarget.forecast(coord: coord)
+                )
             }
         )
     }
@@ -25,6 +31,9 @@ extension WeatherAdapter: DependencyKey {
     static var previewValue: WeatherAdapter {
         return .init(
             fetchCurrentWeather: { coord in
+                return .mock
+            },
+            fetchCurrentForecast: { coord in
                 return .mock
             }
         )
