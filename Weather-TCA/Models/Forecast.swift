@@ -109,6 +109,16 @@ struct Forecast: Decodable, Equatable {
 
 
 extension Forecast {
+    /// 지금 시각 기준으로 24시간 이내에 해당하는 항목만 반환한다.
+    var next24Hours: [Item] {
+        let now = Date()
+        let cutoff = now.addingTimeInterval(24 * 60 * 60)
+        return list.filter { $0.date >= now && $0.date <= cutoff }
+    }
+}
+
+
+extension Forecast {
     static let mock: Forecast = {
         let json = """
         {

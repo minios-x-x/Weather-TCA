@@ -8,7 +8,9 @@
 import SwiftUI
 
 struct ForecastView: View {
+    let item: Forecast
     @State private var scrollOffset: CGFloat = 0.0
+    
     
     private var headerHeight: CGFloat {
         max(90.0, 220.0 - scrollOffset)
@@ -17,12 +19,25 @@ struct ForecastView: View {
     private var isHeaderCollapsed: Bool {
         220.0 - scrollOffset <= 90.0
     }
+    private var dailyGroups: [(date: Date, items: [Forecast.Item])] {
+        let calendar = Calendar.current
+        let grouped = Dictionary(grouping: item.list) { item in
+            calendar.startOfDay(for: item.date)
+        }
+        return grouped.keys.sorted().map { date in
+            (date: date, items: grouped[date] ?? [])
+        }
+    }
     
     @Environment(\.dismiss) private var dismiss
     
     
     private var backgroundGradient: LinearGradient {
-        LinearGradient(colors: [.blue, .cyan], startPoint: .top, endPoint: .bottom)
+        LinearGradient(
+            colors: [.blue, .cyan],
+            startPoint: .top,
+            endPoint: .bottom
+        )
     }
     
     var body: some View {
@@ -77,20 +92,9 @@ struct ForecastView: View {
                                 .foregroundStyle(Color.secondary)
                             ScrollView(.horizontal) {
                                 HStack {
-                                    HourlyCell(item: Forecast.mock.list[0])
-                                    HourlyCell(item: Forecast.mock.list[0])
-                                    HourlyCell(item: Forecast.mock.list[0])
-                                    HourlyCell(item: Forecast.mock.list[0])
-                                    HourlyCell(item: Forecast.mock.list[0])
-                                    HourlyCell(item: Forecast.mock.list[0])
-                                    HourlyCell(item: Forecast.mock.list[0])
-                                    HourlyCell(item: Forecast.mock.list[0])
-                                    HourlyCell(item: Forecast.mock.list[0])
-                                    HourlyCell(item: Forecast.mock.list[0])
-                                    HourlyCell(item: Forecast.mock.list[0])
-                                    HourlyCell(item: Forecast.mock.list[0])
-                                    HourlyCell(item: Forecast.mock.list[0])
-                                    HourlyCell(item: Forecast.mock.list[0])
+                                    ForEach(item.next24Hours, id: \.dtTimestamp) { info in
+                                        HourlyCell(item: info)
+                                    }
                                 }
                             }
                             .padding(.vertical)
@@ -109,47 +113,14 @@ struct ForecastView: View {
                         }
                         
                         ForecastCard {
-                            Rectangle()
-                                .frame(height: 0.5)
-                                .foregroundStyle(Color.secondary)
-                            DailyCell(
-                                items: Forecast.mock.list
-                            )
-                            
-                            Rectangle()
-                                .frame(height: 0.5)
-                                .foregroundStyle(Color.secondary)
-                            DailyCell(
-                                items: Forecast.mock.list
-                            )
-                            
-                            Rectangle()
-                                .frame(height: 0.5)
-                                .foregroundStyle(Color.secondary)
-                            DailyCell(
-                                items: Forecast.mock.list
-                            )
-                            
-                            Rectangle()
-                                .frame(height: 0.5)
-                                .foregroundStyle(Color.secondary)
-                            DailyCell(
-                                items: Forecast.mock.list
-                            )
-                            
-                            Rectangle()
-                                .frame(height: 0.5)
-                                .foregroundStyle(Color.secondary)
-                            DailyCell(
-                                items: Forecast.mock.list
-                            )
-                            
-                            Rectangle()
-                                .frame(height: 0.5)
-                                .foregroundStyle(Color.secondary)
-                            DailyCell(
-                                items: Forecast.mock.list
-                            )
+                            ForEach(dailyGroups, id: \.date) { group in
+                                Rectangle()
+                                    .frame(height: 0.5)
+                                    .foregroundStyle(Color.secondary)
+                                DailyCell(
+                                    items: group.items
+                                )
+                            }
                         } headerView: {
                             Image(systemName: "calendar")
                                 .resizable()
@@ -197,21 +168,5 @@ struct ForecastView: View {
 
 
 #Preview {
-    ForecastView()
-}
-
-
-
-extension View {
-    @ViewBuilder
-    func removeInsets() -> some View {
-        self
-            .listRowInsets(.zero)
-            .listRowSeparator(.hidden)
-            .listRowBackground(Color.clear)
-    }
-}
-
-extension EdgeInsets {
-    static let zero: EdgeInsets = .init(top: 0, leading: 0, bottom: 0, trailing: 0)
+    ForecastView(item: .mock)
 }

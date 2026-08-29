@@ -9,6 +9,8 @@ import ComposableArchitecture
 
 @Reducer
 struct Main {
+    @Dependency(\.weatherAdapter) var weatherAdapter
+    
     struct Target: Equatable, Identifiable {
         var id: Int { locality.id }
         let locality: Locality
@@ -22,6 +24,7 @@ struct Main {
         var cityList: [Target]
         var selectedCity: Target?
         var hasPresented: Bool = false
+        var isFetchingForecast: Bool = false
         var searchQuery: String = ""
         var isOnSearching: Bool = false
         
@@ -33,6 +36,11 @@ struct Main {
     
     enum Action {
         case selectCity(Target?)
+        case fetchForecast(Target)
+        
+        case responseForecast(Target)
+        case responseError(Error)
+        
         case queryChanged(String)
         case focusChanged(Bool)
     }
@@ -40,9 +48,36 @@ struct Main {
     var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
-            case .selectCity(let weather):
+            case .selectCity(let target):
                 state.hasPresented = true
-                state.selectedCity = weather
+                
+                if let target = target {
+                    return .send(.fetchForecast(target))
+                } else {
+                    state.selectedCity = nil
+                    return .none
+                }
+            case .fetchForecast(let target):
+                state.isFetchingForecast = true
+                
+                return .run { send in
+                    let forecast = try await weatherAdapter.fetchCurrentForecast(target.locality.coord)
+                    var updated = target
+                    updated.forecast = forecast
+                    
+                    await send(.responseForecast(updated))
+                } catch: { error, send in
+                    await send(.responseError(error))
+                }
+            case .responseForecast(let target):
+                state.isFetchingForecast = false
+                state.selectedCity = target
+                
+                return .none
+            case .responseError(let error):
+                state.isFetchingForecast = false
+                state.selectedCity = nil
+                
                 return .none
             default:
                 return .none

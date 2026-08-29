@@ -9,13 +9,19 @@ import SwiftUI
 
 struct HourlyCell: View {
     let item: Forecast.Item
+    var iconCode: String {
+        item.condition.first?.icon ?? ""
+    }
+    var temp: String {
+        String(Int(item.info.temp))
+    }
     
     var body: some View {
         VStack(spacing: 1.0) {
-            Text("지금")
-            WeatherSymbol(for: "10d")
+            Text(item.date, format: .dateTime.hour())
+            WeatherSymbol(for: iconCode)
                 .frame(width: 50.0)
-            Text("26°")
+            Text("\(temp)°")
         }
     }
 }

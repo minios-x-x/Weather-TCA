@@ -65,7 +65,6 @@ struct DailyCell: View {
                     )
             }
         }
-        .frame(width: .infinity, alignment: .leading)
     }
 }
 
