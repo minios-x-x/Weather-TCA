@@ -15,8 +15,8 @@ struct Root {
         var main: Main.State?
         var splash: Splash.State = .init()
         
-        mutating func finishSplash(initialValue target: Main.Target) {
-            self.main = .init(initialValue: target)
+        mutating func finishSplash(initialValue targets: [Main.Target]) {
+            self.main = .init(initialValue: targets)
             self.isSplashActive = false
         }
     }
@@ -34,11 +34,7 @@ struct Root {
             switch action {
             case .splash(.finishSplash):
                 state.finishSplash(
-                    initialValue: .init(
-                        locality: state.splash.locality!,
-                        weather: state.splash.weather,
-                        forecast: state.splash.forecast
-                    )
+                    initialValue: state.splash.targets
                 )
                 return .none
             default:

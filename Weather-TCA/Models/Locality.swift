@@ -52,4 +52,8 @@ extension Array where Element == Locality {
             || $0.city.localizedStandardContains(query)
         }
     }
+    func uniqued() -> [Locality] {
+        var seen = Set<Int>()
+        return filter { seen.insert($0.id).inserted }
+    }
 }

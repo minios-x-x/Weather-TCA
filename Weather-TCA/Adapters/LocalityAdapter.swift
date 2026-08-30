@@ -64,3 +64,9 @@ extension SharedReaderKey where Self == InMemoryKey<[Locality]>.Default {
         Self[.inMemory("localities"), default: []]
     }
 }
+
+extension SharedReaderKey where Self == AppStorageKey<[Locality]>.Default {
+    static var bookmarks: Self {
+        Self[.appStorage("bookmark_locations"), default: []]
+    }
+}

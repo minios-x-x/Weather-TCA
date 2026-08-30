@@ -21,6 +21,8 @@ struct Main {
     @ObservableState
     struct State: Equatable {
         @SharedReader(.localities) var localities
+        @Shared(.bookmarks) var bookmarks
+        
         var queryList: [Locality] = []
         
         var cityList: [Target]
@@ -33,9 +35,9 @@ struct Main {
         var searchQuery: String = ""
         var isOnSearching: Bool = false
         
-        init(initialValue target: Target) {
-            cityList = [target]
-            selectedCity = target
+        init(initialValue targets: [Target]) {
+            cityList = targets
+            selectedCity = targets.first
         }
     }
     
