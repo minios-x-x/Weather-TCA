@@ -6,6 +6,7 @@
 //
 
 import Moya
+import Foundation
 
 enum WeatherTarget {
     case current(coord: Locality.Coordinate)
@@ -13,6 +14,10 @@ enum WeatherTarget {
 }
 
 extension WeatherTarget: MoyaTarget {
+    private var apiKey: String {
+        Bundle.main.object(forInfoDictionaryKey: "OPENWEATHER_API_KEY") as? String ?? ""
+    }
+    
     var path: String {
         switch self {
         case .current:
@@ -37,7 +42,7 @@ extension WeatherTarget: MoyaTarget {
                 "lon": target.lng,
                 "units": "metric",
                 "lang": "kr",
-                "appid": "825364e6c96d79c5c7f65e4bb2130762"
+                "appid": apiKey
             ]
             
             return .requestParameters(
@@ -50,7 +55,7 @@ extension WeatherTarget: MoyaTarget {
                 "lon": target.lng,
                 "units": "metric",
                 "lang": "kr",
-                "appid": "825364e6c96d79c5c7f65e4bb2130762"
+                "appid": apiKey
             ]
             
             return .requestParameters(
