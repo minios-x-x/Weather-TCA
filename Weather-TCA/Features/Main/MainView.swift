@@ -32,7 +32,7 @@ struct MainView: View {
                                 .listRowBackground(Color.clear)   // row 기본 흰 배경 제거
                                 .listRowSeparator(.hidden)        // 구분선 제거
                                 .padding(.horizontal)
-                                .padding(.vertical)
+                                .padding(.vertical, 5.0)
                                 .matchedTransitionSource(
                                     id: city.id,
                                     in: namespace
@@ -112,11 +112,16 @@ struct MainView: View {
                     content: { target in
                         if let forecast = target.forecast, let weather = target.weather {
                             ForecastSheetView(
-                                .init(
+                                content: .init(
                                     locality: target.locality,
                                     forecast: forecast,
                                     weather: weather
-                                )
+                                ),
+                                action: {
+                                    store.send(
+                                        .bookmarkCity(target)
+                                    )
+                                }
                             )
                         } else {
                             ProgressView()

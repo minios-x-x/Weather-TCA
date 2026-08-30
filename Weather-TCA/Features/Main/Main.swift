@@ -47,7 +47,10 @@ struct Main {
         
         case selectQuery(Target?)
         case responseQuery(Target)
-
+        
+        case bookmarkCity(Target)
+        case refreshBookmark([Target])
+        
         case responseError(Error)
         
         case queryChanged(String)
@@ -107,6 +110,36 @@ struct Main {
             case .responseQuery(let target):
                 state.isFetchingForecast = false
                 state.selectedQuery = target
+                
+                return .none
+            case .bookmarkCity(let target):
+                state.$bookmarks.withLock {
+                    $0 = ($0 + [target.locality] + [.seoul]).uniqued()
+                }
+                let bookmarks = state.bookmarks
+
+                return .run { send in
+                    var targets: [Target] = []
+                    for bookmark in bookmarks {
+                        let weather = try await weatherAdapter.fetchCurrentWeather(bookmark.coord)
+                        let forecast = try await weatherAdapter.fetchCurrentForecast(bookmark.coord)
+                        
+                        targets.append(
+                            .init(
+                                locality: bookmark,
+                                weather: weather,
+                                forecast: forecast
+                            )
+                        )
+                    }
+                    
+                    await send(.refreshBookmark(targets))
+                }
+            case .refreshBookmark(let target):
+                state.cityList = target
+                state.isOnSearching = false
+                state.searchQuery = ""
+                state.selectedQuery = nil
                 
                 return .none
             case .queryChanged(let query):

@@ -212,12 +212,15 @@ struct ForecastFullScreenView: View {
 }
 
 struct ForecastSheetView: View {
-    init(_ content: ForecastContentView.Content) {
+    init(content: ForecastContentView.Content, action handler: @escaping () -> Void) {
         self.content = content
+        self.onSave = handler
     }
     
     let content: ForecastContentView.Content
+    
     @Environment(\.dismiss) private var dismiss
+    var onSave: () -> Void
     
     var body: some View {
         NavigationStack {
@@ -233,7 +236,7 @@ struct ForecastSheetView: View {
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
-                        
+                        onSave()
                     } label: {
                         Text("추가")
                             .foregroundStyle(.white)
