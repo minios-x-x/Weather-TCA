@@ -21,10 +21,15 @@ struct Main {
     @ObservableState
     struct State: Equatable {
         @SharedReader(.localities) var localities
+        var queryList: [Locality] = []
+        
         var cityList: [Target]
         var selectedCity: Target?
+        var selectedQuery: Target?
+        
         var hasPresented: Bool = false
         var isFetchingForecast: Bool = false
+        
         var searchQuery: String = ""
         var isOnSearching: Bool = false
         
@@ -36,9 +41,11 @@ struct Main {
     
     enum Action {
         case selectCity(Target?)
-        case fetchForecast(Target)
+        case responseCity(Target)
         
-        case responseForecast(Target)
+        case selectQuery(Target?)
+        case responseQuery(Target)
+
         case responseError(Error)
         
         case queryChanged(String)
@@ -52,34 +59,65 @@ struct Main {
                 state.hasPresented = true
                 
                 if let target = target {
-                    return .send(.fetchForecast(target))
+                    state.isFetchingForecast = true
+                    return .run { send in
+                        let forecast = try await weatherAdapter.fetchCurrentForecast(target.locality.coord)
+                        let weather = try await weatherAdapter.fetchCurrentWeather(target.locality.coord)
+                        
+                        var updated = target
+                        updated.forecast = forecast
+                        updated.weather = weather
+                        
+                        await send(.responseCity(updated))
+                    } catch: { error, send in
+                        await send(.responseError(error))
+                    }
                 } else {
                     state.selectedCity = nil
                     return .none
                 }
-            case .fetchForecast(let target):
-                state.isFetchingForecast = true
-                
-                return .run { send in
-                    let forecast = try await weatherAdapter.fetchCurrentForecast(target.locality.coord)
-                    var updated = target
-                    updated.forecast = forecast
-                    
-                    await send(.responseForecast(updated))
-                } catch: { error, send in
-                    await send(.responseError(error))
-                }
-            case .responseForecast(let target):
+            case .responseCity(let target):
                 state.isFetchingForecast = false
                 state.selectedCity = target
                 
                 return .none
-            case .responseError(let error):
+            case .selectQuery(let target):
+                if let target = target {
+                    state.isFetchingForecast = true
+                    return .run { send in
+                        let forecast = try await weatherAdapter.fetchCurrentForecast(target.locality.coord)
+                        let weather = try await weatherAdapter.fetchCurrentWeather(target.locality.coord)
+                        
+                        let target: Target = .init(
+                            locality: target.locality,
+                            weather: weather,
+                            forecast: forecast
+                        )
+                        
+                        await send(.responseQuery(target))
+                    } catch: { error, send in
+                        await send(.responseError(error))
+                    }
+                } else {
+                    state.selectedQuery = nil
+                    return .none
+                }
+            case .responseQuery(let target):
+                state.isFetchingForecast = false
+                state.selectedQuery = target
+                
+                return .none
+            case .queryChanged(let query):
+                state.searchQuery = query
+                state.queryList = state.localities.filtered(by: query)
+                return .none
+            case .focusChanged(let focused):
+                state.isOnSearching = focused
+                return .none
+            case .responseError(_):
                 state.isFetchingForecast = false
                 state.selectedCity = nil
                 
-                return .none
-            default:
                 return .none
             }
         }

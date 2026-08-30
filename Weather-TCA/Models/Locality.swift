@@ -42,3 +42,14 @@ extension Locality {
         )
     )
 }
+
+extension Array where Element == Locality {
+    func filtered(by query: String) -> [Locality] {
+        guard !query.isEmpty else { return [] }
+        return filter {
+            $0.country.localizedStandardContains(query)
+            || $0.province.localizedStandardContains(query)
+            || $0.city.localizedStandardContains(query)
+        }
+    }
+}

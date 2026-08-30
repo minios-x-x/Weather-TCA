@@ -16,22 +16,33 @@ struct MainView: View {
         ZStack {
             NavigationStack {
                 List{
-                    ForEach(store.state.cityList) { city in
-                        CityRow(city: city)
-                            .listRowInsets(EdgeInsets())      // row 기본 여백 제거
-                            .listRowBackground(Color.clear)   // row 기본 흰 배경 제거
-                            .listRowSeparator(.hidden)        // 구분선 제거
-                            .padding(.horizontal)
-                            .padding(.vertical)
-                            .matchedTransitionSource(
-                                id: city.id,
-                                in: namespace
-                            )
-                            .onTapGesture {
-                                store.send(
-                                    .selectCity(city)
+                    if store.isOnSearching {
+                        ForEach(store.state.queryList) { locality in
+                            QueryRow(locality, matching: store.searchQuery)
+                                .onTapGesture { _ in
+                                    store.send(.selectQuery(
+                                        .init(locality: locality)
+                                    ))
+                                }
+                        }
+                    } else {
+                        ForEach(store.state.cityList) { city in
+                            CityRow(city: city)
+                                .listRowInsets(EdgeInsets())      // row 기본 여백 제거
+                                .listRowBackground(Color.clear)   // row 기본 흰 배경 제거
+                                .listRowSeparator(.hidden)        // 구분선 제거
+                                .padding(.horizontal)
+                                .padding(.vertical)
+                                .matchedTransitionSource(
+                                    id: city.id,
+                                    in: namespace
                                 )
-                            }
+                                .onTapGesture {
+                                    store.send(
+                                        .selectCity(city)
+                                    )
+                                }
+                        }
                     }
                 }
                 .listStyle(.plain)
@@ -69,14 +80,45 @@ struct MainView: View {
                         }
                     ),
                     content: { target in
-                        if let forecast = target.forecast {
-                            ForecastView(item: forecast)
+                        if let forecast = target.forecast, let weather = target.weather {
+                            ForecastFullScreenView(
+                                .init(
+                                    locality: target.locality,
+                                    forecast: forecast,
+                                    weather: weather
+                                )
+                            )
                                 .navigationTransition(
                                     .zoom(sourceID: target.id, in: namespace)
                                 )
                         } else {
                             // 설계상 이 분기는 사실상 안 옴 (selectedCity는 fetch 끝난 뒤에만 세팅되니까)
                             // force-unwrap 대신 방어적으로만 남겨두는 용도
+                            ProgressView()
+                        }
+                    }
+                )
+                .sheet(
+                    item: Binding(
+                        get: {
+                            store.selectedQuery
+                        },
+                        set: { newValue in
+                            store.send(
+                                .selectQuery(newValue)
+                            )
+                        }
+                    ),
+                    content: { target in
+                        if let forecast = target.forecast, let weather = target.weather {
+                            ForecastSheetView(
+                                .init(
+                                    locality: target.locality,
+                                    forecast: forecast,
+                                    weather: weather
+                                )
+                            )
+                        } else {
                             ProgressView()
                         }
                     }
