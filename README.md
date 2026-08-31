@@ -6,9 +6,9 @@
 
 <!-- TODO: 아래 경로에 실제 스크린샷 / GIF로 교체 -->
 <p align="center">
-  <img src="docs/screenshots/main.png" width="250" alt="메인 화면 (즐겨찾기 리스트)" />
-  <img src="docs/screenshots/search.png" width="250" alt="검색 화면" />
-  <img src="docs/screenshots/detail.gif" width="250" alt="상세 화면 진입 (Zoom Transition)" />
+  <img src="docs/screenshots/main.gif" width="250" alt="메인 화면 (즐겨찾기 리스트)" />
+  <img src="docs/screenshots/search.gif" width="250" alt="검색 화면 (도시 검색 후 선택)" />
+  <img src="docs/screenshots/zoom-transition.gif" width="250" alt="상세 화면 진입 (Zoom Transition)" />
 </p>
 
 ## 주요 기능
